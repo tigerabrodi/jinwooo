@@ -1,10 +1,11 @@
-import { Button } from './components/ui/button'
+import { api } from '@convex/_generated/api'
+import { useQuery } from 'convex/react'
 
 function App() {
+  const tasks = useQuery(api.tasks.get)
+
   return (
-    <div>
-      <Button isLoading>Hello World</Button>
-    </div>
+    <div>{tasks?.map((task) => <div key={task._id}>{task.text}</div>)}</div>
   )
 }
 
