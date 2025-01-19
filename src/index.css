@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Three-panel layout colors */
+    --content: 0 0% 12%; /* Darkest - left panel */
+    --background: 0 0% 14%; /* Middle panel */
+    --sidebar: 0 0% 16%; /* Lightest - right panel */
+
+    /* Text colors */
+    --foreground: 0 0% 98%;
+
+    /* Adjusted primary (softer gold) */
+    --primary: 45 85% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Rest of your existing variables with slight adjustments */
+    --card: 0 0% 15%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 0 0% 98%;
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 0 0% 18%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 20%;
+    --input: 0 0% 18%;
+    --ring: 45 85% 45%;
+
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  #root {
+    @apply flex h-screen flex-col py-4;
+  }
+}
