@@ -1,26 +1,14 @@
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu'
-import { useToast } from '@/hooks/use-toast'
 import { ROUTES } from '@/lib/constants'
-import { cn, handlePromise } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import { api } from '@convex/_generated/api'
 import { Id } from '@convex/_generated/dataModel'
-import { useMutation } from 'convex/react'
-import { ChevronRight, Folder as FolderIcon, NotebookPen } from 'lucide-react'
+import { ChevronRight, Folder as FolderIcon } from 'lucide-react'
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { generatePath, useNavigate, useParams } from 'react-router'
 
@@ -35,6 +23,7 @@ type FolderProps = {
   onToggle: (id: Id<'folders'>) => void
   isNew: boolean
   onNewStateChange: (isNew: boolean) => void
+  onDelete: (id: Id<'folders'>) => void
   onAddSubfolder: ({
     parentId,
     depth,
@@ -45,6 +34,10 @@ type FolderProps = {
     depth: number
     shouldExpand: boolean
     currentFolderId: Id<'folders'>
+  }) => void
+  onUpdateFolder: (args: {
+    id: Id<'folders'>
+    data: Partial<typeof api.folders.updateFolder._args.data>
   }) => void
 }
 
@@ -60,39 +53,11 @@ export function Folder({
   isNew,
   onNewStateChange,
   onAddSubfolder,
+  onUpdateFolder,
+  onDelete,
 }: FolderProps) {
   const params = useParams<{ folderId: string }>()
   const navigate = useNavigate()
-  const deleteFolder = useMutation(api.folders.deleteFolder)
-  const updateFolder = useMutation(
-    api.folders.updateFolder
-  ).withOptimisticUpdate((localStore, args) => {
-    const { id, data } = args
-    const currentFolders = localStore.getQuery(api.folders.allFolders)
-
-    if (currentFolders !== undefined) {
-      // Create a completely new array with the updated folder
-      const updatedFolders = currentFolders.map((folder) => {
-        if (folder._id === id) {
-          // Create a completely new folder object
-          return {
-            ...folder,
-            ...data,
-            // Add timestamp to force React to see it as a new value
-            _updatedAt: Date.now(),
-          }
-        }
-        return folder
-      })
-
-      // Ensure we're passing a new array reference
-      localStore.setQuery(api.folders.allFolders, {}, [...updatedFolders])
-    }
-  })
-
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-
-  const { toast } = useToast()
 
   const isSelected = params.folderId === id
 
@@ -115,24 +80,6 @@ export function Folder({
     }
   }, [isNew])
 
-  const onDelete = async () => {
-    const [, error] = await handlePromise(deleteFolder({ id }))
-    if (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to delete folder',
-        variant: 'destructive',
-      })
-      return
-    }
-
-    toast({
-      title: 'Folder deleted',
-      description: 'All notes and any subfolders will be deleted.',
-      variant: 'default',
-    })
-  }
-
   const handleAddSubfolder = () => {
     const parentId = isRoot ? null : id
     const newDepth = isRoot ? 0 : depth + 1
@@ -145,7 +92,7 @@ export function Folder({
     })
   }
 
-  const handleRename = async () => {
+  const handleRename = () => {
     const originalName = name
     const isNewNameEmpty = editedName.trim() === ''
     const isNameChanged = editedName.trim() !== originalName.trim()
@@ -158,15 +105,12 @@ export function Folder({
       setIsEditing(false)
       onNewStateChange(false)
 
-      // Then trigger the mutation
-      await handlePromise(
-        updateFolder({
-          id,
-          data: {
-            name: newName,
-          },
-        })
-      )
+      onUpdateFolder({
+        id,
+        data: {
+          name: newName,
+        },
+      })
     } else {
       // Just reset the state if no real change
       setEditedName(name)
@@ -332,7 +276,7 @@ export function Folder({
           </ContextMenuItem>
           {!isRoot && (
             <ContextMenuItem
-              onSelect={() => void onDelete()}
+              onSelect={() => onDelete(id)}
               className="px-2 py-1 text-sm text-primary-foreground hover:bg-primary"
             >
               Delete folder
@@ -340,36 +284,6 @@ export function Folder({
           )}
         </ContextMenuContent>
       </ContextMenu>
-
-      <AlertDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-      >
-        <AlertDialogContent className="max-w-72 bg-content">
-          <AlertDialogHeader className="flex max-w-full flex-col items-center gap-2 text-center">
-            <NotebookPen className="size-10 text-primary" />
-            <div className="flex flex-col gap-1">
-              <AlertDialogTitle className="text-center text-sm text-primary-foreground">
-                Are you sure you want to delete this folder?
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-center text-xs text-primary-foreground">
-                All notes and any subfolders will be deleted.
-              </AlertDialogDescription>
-            </div>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="mx-auto mt-4">
-            <AlertDialogCancel className="h-8 bg-sidebar text-sm">
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => void onDelete()}
-              className="h-8 text-sm"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   )
 }
