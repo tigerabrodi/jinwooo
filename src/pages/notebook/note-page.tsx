@@ -10,15 +10,6 @@ import { useDebounceCallback } from './hooks/useDebounceCallback'
 
 const DEBOUNCE_DELAY = 500
 
-export function NotePageWrapper() {
-  const { noteId: selectedNoteId } = useParams<{ noteId: Id<'notes'> }>()
-
-  // key is needed
-  // otherwise the component will not remount when the noteId changes
-  // that's what we want for local states to be reset
-  return <NotePage key={selectedNoteId} />
-}
-
 export function NotePage() {
   const { noteId: selectedNoteId } = useParams<{ noteId: Id<'notes'> }>()
   const note = useQuery(api.notes.getNoteById, {
@@ -28,16 +19,21 @@ export function NotePage() {
 
   const [, setStatus] = useAtom(editorStatusAtom)
 
+  const [shouldInitialize, setShouldInitialize] = useState(true)
   const [localContent, setLocalContent] = useState('')
   const [localTitle, setLocalTitle] = useState('')
 
   useEffect(() => {
-    const shouldInitialize = note && !localContent && !localTitle
-    if (shouldInitialize) {
+    setShouldInitialize(true)
+  }, [selectedNoteId])
+
+  useEffect(() => {
+    if (shouldInitialize && note) {
       setLocalContent(note.content)
       setLocalTitle(note.title)
+      setShouldInitialize(false)
     }
-  }, [note, localContent, localTitle])
+  }, [note, shouldInitialize])
 
   const debouncedUpdate = useDebounceCallback(
     (id: Id<'notes'>, data: { title?: string; content?: string }) => {
@@ -69,8 +65,6 @@ export function NotePage() {
 
   if (!selectedNoteId) return null
 
-  const isNoteLoading = note === undefined
-
   return (
     <div className="flex flex-1 flex-col bg-content">
       <div className="flex flex-1 flex-col gap-4 p-4">
@@ -78,39 +72,31 @@ export function NotePage() {
           Note title
         </label>
 
-        {isNoteLoading ? (
-          <div className="h-5 w-2/4 animate-pulse rounded bg-muted" />
-        ) : (
-          <input
-            type="text"
-            id="note-title"
-            name="note-title"
-            value={localTitle}
-            onChange={(event) => {
-              setLocalTitle(event.target.value)
-              debouncedUpdate(selectedNoteId, { title: event.target.value })
-            }}
-            className="border-none bg-transparent text-xl font-medium outline-none"
-            placeholder="Note title"
-          />
-        )}
+        <input
+          type="text"
+          id="note-title"
+          name="note-title"
+          value={localTitle}
+          onChange={(event) => {
+            setLocalTitle(event.target.value)
+            debouncedUpdate(selectedNoteId, { title: event.target.value })
+          }}
+          className="border-none bg-transparent text-xl font-medium outline-none"
+          placeholder="Note title"
+        />
 
         <label htmlFor="note-content" className="sr-only">
           Note content
         </label>
 
-        {isNoteLoading ? (
-          <div className="h-20 w-full animate-pulse rounded bg-muted" />
-        ) : (
-          <textarea
-            id="note-content"
-            name="note-content"
-            value={localContent}
-            onChange={(event) => handleContentChange(event.target.value)}
-            className="flex-1 resize-none border-none bg-transparent outline-none"
-            placeholder="Start writing..."
-          />
-        )}
+        <textarea
+          id="note-content"
+          name="note-content"
+          value={localContent}
+          onChange={(event) => handleContentChange(event.target.value)}
+          className="flex-1 resize-none border-none bg-transparent outline-none"
+          placeholder="Start writing..."
+        />
       </div>
     </div>
   )
