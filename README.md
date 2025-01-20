@@ -1,4 +1,6 @@
+  
 <div align="center">
+  https://github.com/user-attachments/assets/7cef38dc-bcf5-4d48-b295-25b97f957fda
 <h1 align="center">
   <a href="https://narumory.com">Jinwoo</a>
 </h1>
