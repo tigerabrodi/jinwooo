@@ -1,50 +1,45 @@
-# React + TypeScript + Vite
+<div align="center">
+<h1 align="center">
+  <a href="https://narumory.com">Jinwoo</a>
+</h1>
+  <p>
+    A note taking app inspired by Apple Notes
+  </p>
+</div>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Why I made this
 
-Currently, two official plugins are available:
+I use Apple Notes for my daily note taking. Of course, there are a bunch of cool apps out there. But Apple Notes is perfect. It's simple and works.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+I played around with their folders and how e.g. notes count are recursively calculated. As a fan of recursion and having built a real file/folder picker in the past, I had to do this haha
 
-## Expanding the ESLint configuration
+## Tech stack 💻
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- [React](https://react.dev/) for frontend.
+- [Convex](https://www.convex.dev/) for backend.
+- [Motion](https://motion.dev/) for animations.
+- [Tailwind](https://tailwindcss.com/) for styling.
+- [Shadcn](https://ui.shadcn.com/) for components.
+- [Vercel](https://vercel.com/) for hosting and web analytics.
 
-- Configure the top-level `parserOptions` property like this:
+## Cloning & running 🏄
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+1. Clone the repo: `git clone https://github.com/tigerabrodi/jinwooo`
+2. Setup a Convex account and create a new project.
+3. Run `pnpm install`
+4. Run `npx convex dev` (this will setup your `.env.local` file)
+5. Run `pnpm dev`
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Bugs & Contributing 🐛
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+I assume you've it up and running by yourself.
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+If you find a bug, create an issue.
+
+If you want to contribute, make sure an issue is already created and ASSIGNED to you. Don't waste your time making a PR that won't be merged.
+
+If it's something that I think should be addressed, we can discuss the solution in the github issue, and then you can go ahead and make a PR.
+
+## License
+
+This project is licensed under the MIT License ❤️
