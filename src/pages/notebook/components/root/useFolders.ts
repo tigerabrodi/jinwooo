@@ -3,20 +3,16 @@ import { useCallback, useState } from 'react'
 
 export function useFolders(initialFolders: Array<Doc<'folders'>> | undefined) {
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set())
-  const [newFolderIds, setNewFolderIds] = useState<Set<string>>(new Set())
+  const [newFolderId, setNewFolderId] = useState<string | null>(null)
 
   // Add a function to mark a folder as new
   const markFolderAsNew = useCallback((folderId: string) => {
-    setNewFolderIds((current) => new Set([...current, folderId]))
+    setNewFolderId(folderId)
   }, [])
 
   // Add a function to unmark a folder as new
-  const unmarkFolderAsNew = useCallback((folderId: string) => {
-    setNewFolderIds((current) => {
-      const next = new Set(current)
-      next.delete(folderId)
-      return next
-    })
+  const unmarkFolderAsNew = useCallback(() => {
+    setNewFolderId(null)
   }, [])
 
   const toggleFolder = useCallback((folderId: string) => {
@@ -57,6 +53,6 @@ export function useFolders(initialFolders: Array<Doc<'folders'>> | undefined) {
     getChildFolders,
     markFolderAsNew,
     unmarkFolderAsNew,
-    newFolderIds,
+    newFolderId,
   }
 }
