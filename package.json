@@ -21,6 +21,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "convex": "^1.18.2",
+    "jotai": "^2.11.1",
     "lucide-react": "^0.473.0",
     "motion": "^11.18.1",
     "react": "^19.0.0",

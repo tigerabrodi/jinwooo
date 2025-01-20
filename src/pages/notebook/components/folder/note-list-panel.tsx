@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { ROUTES } from '@/lib/constants'
 import { api } from '@convex/_generated/api'
-import { Id } from '@convex/_generated/dataModel'
+import { Doc, Id } from '@convex/_generated/dataModel'
 import { useMutation, useQuery } from 'convex/react'
 import { Trash } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
@@ -30,15 +30,42 @@ export function NoteListPanel() {
           (note) => note._id !== args.noteId
         )
 
-        const optimisticFolders = existingFolders.map((folder) => {
-          if (folder._id === args.folderId) {
-            return {
-              ...folder,
-              noteCount: folder.noteCount - 1,
+        const folder = existingFolders.find(
+          (folder) => folder._id === args.folderId
+        )
+        let optimisticFolders: Array<Doc<'folders'>> = []
+
+        // if initial, we only need to update the note count
+        // if not initial, we need to update note count of folder and the initial one
+
+        if (folder?.isInitial) {
+          optimisticFolders = existingFolders.map((folder) => {
+            if (folder._id === args.folderId) {
+              return {
+                ...folder,
+                noteCount: folder.noteCount - 1,
+              }
             }
-          }
-          return folder
-        })
+            return folder
+          })
+        } else {
+          const initialFolder = existingFolders.find(
+            (folder) => folder.isInitial
+          )
+
+          optimisticFolders = existingFolders.map((folder) => {
+            if (
+              folder._id === initialFolder?._id ||
+              folder._id === args.folderId
+            ) {
+              return {
+                ...folder,
+                noteCount: folder.noteCount - 1,
+              }
+            }
+            return folder
+          })
+        }
 
         // Update the local query result
         localStore.setQuery(

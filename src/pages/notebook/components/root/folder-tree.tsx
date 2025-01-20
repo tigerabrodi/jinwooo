@@ -29,7 +29,7 @@ export function FolderTree() {
     expandedFolders,
     toggleFolder,
     getChildFolders,
-    newFolderIds,
+    newFolderId,
     markFolderAsNew,
     unmarkFolderAsNew,
   } = useFolders(folders)
@@ -195,6 +195,8 @@ export function FolderTree() {
   }
 
   const renderFolders = (parentId: string | null) => {
+    // we start with null
+    // means start with all folders at root level
     const childFolders = getChildFolders(parentId)
 
     if (!childFolders) return null
@@ -203,7 +205,7 @@ export function FolderTree() {
       const hasChildren = folders.some((f) => f.parentId === folder._id)
       const isExpanded = expandedFolders.has(folder._id)
 
-      const isNew = newFolderIds.has(folder._id)
+      const isNew = newFolderId === folder._id
 
       return (
         <div key={folder._id}>
@@ -224,7 +226,7 @@ export function FolderTree() {
               if (newState) {
                 markFolderAsNew(folder._id)
               } else {
-                unmarkFolderAsNew(folder._id)
+                unmarkFolderAsNew()
               }
             }}
           />
