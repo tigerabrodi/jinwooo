@@ -49,10 +49,22 @@ export const updateFolder = mutation({
     await ctx.db.patch(args.id, { ...args.data, updatedAt: Date.now() })
   },
 })
-
 export const deleteFolder = mutation({
   args: { id: v.id('folders') },
   handler: async (ctx, args) => {
+    const folder = await ctx.db.get(args.id)
+    const user = await requireCurrentUser(ctx)
+
+    if (!folder || !user.initialFolderId) {
+      throw new Error('Folder not found')
+    }
+
+    const initialFolder = await ctx.db.get(user.initialFolderId)
+
+    if (folder.isInitial || !initialFolder) {
+      throw new Error('Cannot delete initial folder')
+    }
+
     const folderIds = new Set<Id<'folders'>>()
     const noteIds = new Set<Id<'notes'>>()
 
@@ -82,10 +94,15 @@ export const deleteFolder = mutation({
     // Start collection from the target folder
     await collectFolderAndNotes(args.id)
 
+    const noteCountToSubtract = noteIds.size
+
     // Delete all collected notes and folders
     await Promise.all([
       ...Array.from(noteIds).map((noteId) => ctx.db.delete(noteId)),
       ...Array.from(folderIds).map((folderId) => ctx.db.delete(folderId)),
+      ctx.db.patch(user.initialFolderId, {
+        noteCount: initialFolder.noteCount - noteCountToSubtract,
+      }),
     ])
   },
 })
