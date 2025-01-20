@@ -5,9 +5,11 @@ import { handlePromise } from '@/lib/utils'
 import { api } from '@convex/_generated/api'
 import { Id } from '@convex/_generated/dataModel'
 import { useMutation } from 'convex/react'
-import { Plus } from 'lucide-react'
+import { useAtom } from 'jotai'
+import { Loader2, Plus } from 'lucide-react'
 import { useActionState } from 'react'
 import { generatePath, Outlet, useNavigate, useParams } from 'react-router'
+import { editorStatusAtom } from '../../atoms/editor'
 import { Header } from '../header'
 
 export function NoteEditorPanel() {
@@ -17,6 +19,8 @@ export function NoteEditorPanel() {
   const navigate = useNavigate()
 
   const createNote = useMutation(api.notes.createNote)
+
+  const [status] = useAtom(editorStatusAtom)
 
   const [, formAction, isPending] = useActionState<object, FormData>(
     async () => {
@@ -49,7 +53,7 @@ export function NoteEditorPanel() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <Header>
+      <Header className="justify-between pr-4">
         <form action={formAction}>
           <Button
             variant="ghost"
@@ -62,6 +66,10 @@ export function NoteEditorPanel() {
             <Plus className="size-5" />
           </Button>
         </form>
+
+        {status === 'pending' && (
+          <Loader2 className="ml-auto size-5 animate-spin" />
+        )}
       </Header>
 
       <Outlet />
