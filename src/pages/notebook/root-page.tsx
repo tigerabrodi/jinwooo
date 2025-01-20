@@ -33,7 +33,7 @@ export function RootPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-4">
+      <div className="flex flex-1 items-center justify-center p-4">
         <Loader2 className="size-10 animate-spin" />
       </div>
     )

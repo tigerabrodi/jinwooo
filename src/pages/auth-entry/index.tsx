@@ -31,14 +31,14 @@ export function AuthEntryPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-4">
+      <div className="flex flex-1 items-center justify-center">
         <Loader2 className="size-10 animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
+    <div className="flex flex-1 items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="flex flex-col gap-1">
           <CardTitle className="font-ninja text-center text-2xl text-primary">
