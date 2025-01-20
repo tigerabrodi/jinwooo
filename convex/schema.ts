@@ -19,7 +19,7 @@ export default defineSchema({
     updatedAt: v.number(),
     parentId: v.union(v.id('folders'), v.null()),
     userId: v.id('users'),
-  }),
+  }).index('by_userId', ['userId']),
 
   notes: defineTable({
     title: v.string(),
