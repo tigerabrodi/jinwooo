@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { ROUTES } from '@/lib/constants'
 import { api } from '@convex/_generated/api'
-import { Doc, Id } from '@convex/_generated/dataModel'
+import { Id } from '@convex/_generated/dataModel'
 import { useMutation, useQuery } from 'convex/react'
 import { Trash } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
@@ -17,65 +17,42 @@ export function NoteListPanel() {
 
   const deleteNote = useMutation(api.notes.deleteNote).withOptimisticUpdate(
     (localStore, args) => {
-      // Get current notes list
       const existingNotes = localStore.getQuery(api.notes.getNotesByFolderId, {
         folderId: folderId as Id<'folders'>,
       })
-
       const existingFolders = localStore.getQuery(api.folders.allFolders)
 
-      if (existingNotes && existingFolders) {
-        // Filter out the deleted note
-        const updatedNotes = existingNotes.filter(
-          (note) => note._id !== args.noteId
-        )
+      if (!existingNotes || !existingFolders) return
 
-        const folder = existingFolders.find(
-          (folder) => folder._id === args.folderId
-        )
-        let optimisticFolders: Array<Doc<'folders'>> = []
+      const updatedNotes = existingNotes.filter(
+        (note) => note._id !== args.noteId
+      )
 
-        // if initial, we only need to update the note count
-        // if not initial, we need to update note count of folder and the initial one
+      const folder = existingFolders.find(
+        (folder) => folder._id === args.folderId
+      )
+      const initialFolder = existingFolders.find((folder) => folder.isInitial)
 
-        if (folder?.isInitial) {
-          optimisticFolders = existingFolders.map((folder) => {
-            if (folder._id === args.folderId) {
-              return {
-                ...folder,
-                noteCount: folder.noteCount - 1,
-              }
-            }
-            return folder
-          })
-        } else {
-          const initialFolder = existingFolders.find(
-            (folder) => folder.isInitial
-          )
+      // should never happen
+      if (!folder || !initialFolder) return
 
-          optimisticFolders = existingFolders.map((folder) => {
-            if (
-              folder._id === initialFolder?._id ||
-              folder._id === args.folderId
-            ) {
-              return {
-                ...folder,
-                noteCount: folder.noteCount - 1,
-              }
-            }
-            return folder
-          })
-        }
+      // Determine which folders need updating (same logic as backend)
+      const foldersToUpdate = new Set([folder._id, initialFolder._id])
 
-        // Update the local query result
-        localStore.setQuery(
-          api.notes.getNotesByFolderId,
-          { folderId: folderId as Id<'folders'> },
-          updatedNotes
-        )
+      // Update folder counts
+      const optimisticFolders = existingFolders.map((folder) =>
+        foldersToUpdate.has(folder._id)
+          ? { ...folder, noteCount: folder.noteCount - 1 }
+          : folder
+      )
 
-        localStore.setQuery(api.folders.allFolders, {}, optimisticFolders)
-      }
+      // Update both queries
+      localStore.setQuery(
+        api.notes.getNotesByFolderId,
+        { folderId: folderId as Id<'folders'> },
+        updatedNotes
+      )
+      localStore.setQuery(api.folders.allFolders, {}, optimisticFolders)
     }
   )
 
