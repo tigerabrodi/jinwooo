@@ -29,11 +29,15 @@ export function AuthEntryPage() {
     }
   }, [isLoading, user, navigate])
 
-  return isLoading ? (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Loader2 className="size-10 animate-spin" />
-    </div>
-  ) : (
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <Loader2 className="size-10 animate-spin" />
+      </div>
+    )
+  }
+
+  return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="flex flex-col gap-1">
