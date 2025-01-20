@@ -1,18 +1,19 @@
 import { Password } from '@convex-dev/auth/providers/Password'
 import { convexAuth } from '@convex-dev/auth/server'
+import { DataModel } from './_generated/dataModel'
+import { MutationCtx } from './_generated/server'
 
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
-  providers: [Password],
+  providers: [Password<DataModel>()],
   callbacks: {
-    async createOrUpdateUser(ctx, args) {
+    async createOrUpdateUser(ctx: MutationCtx, args) {
       if (args.existingUserId) {
         return args.existingUserId
       }
 
       // First create the user
       const userId = await ctx.db.insert('users', {
-        email: args.profile.email,
-        image: args.profile.image,
+        email: args.profile.email || '',
         updatedAt: Date.now(),
         initialFolderId: null,
       })
@@ -22,7 +23,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         name: 'All Notes',
         depth: 0,
         isInitial: true,
-        noteCount: 0,
+        noteCount: 1,
         parentId: null,
         userId: userId, // We can use the userId directly
         updatedAt: Date.now(),
