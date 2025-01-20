@@ -4,8 +4,7 @@ export const TAB_VALUES = {
 } as const
 
 export const ROUTES = {
-  login: '/login',
-  register: '/register',
+  authEntry: '/',
   notebook: '/notebook',
   notebookFolder: '/notebook/:folderId',
   notebookNote: '/notebook/:folderId/:noteId',
