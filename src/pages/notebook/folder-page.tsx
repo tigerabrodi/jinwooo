@@ -1,9 +1,11 @@
-import { Outlet } from 'react-router'
+import { NoteEditorPanel } from './components/folder/note-editor-panel'
+import { NoteListPanel } from './components/folder/note-list-panel'
 
 export function FolderPage() {
   return (
-    <div>
-      <Outlet />
-    </div>
+    <>
+      <NoteListPanel />
+      <NoteEditorPanel />
+    </>
   )
 }
