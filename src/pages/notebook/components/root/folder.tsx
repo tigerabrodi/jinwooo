@@ -151,7 +151,6 @@ export function Folder({
     )
 
     if (!event.relatedTarget || !isRadixMenuItem) {
-      console.log('blur happening')
       void handleRename()
     } else {
       requestAnimationFrame(() => {

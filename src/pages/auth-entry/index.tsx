@@ -19,8 +19,6 @@ export function AuthEntryPage() {
   const isLoading = user === undefined || state.isLoading
   const navigate = useNavigate()
 
-  console.log('user', user)
-
   useEffect(() => {
     if (!isLoading && user && user.initialFolderId) {
       void navigate(
