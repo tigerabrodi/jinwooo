@@ -1,7 +1,7 @@
 https://github.com/user-attachments/assets/7cef38dc-bcf5-4d48-b295-25b97f957fda
 <div align="center">
 <h1 align="center">
-  <a href="https://narumory.com">Jinwoo</a>
+  <a href="https://jinwooo.vercel.app/">Jinwoo</a>
 </h1>
   <p>
     A note taking app inspired by Apple Notes
